@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fransuz Tili — 300 Savol Testi</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d14;
+    --card: #16161f;
+    --border: #2a2a3a;
+    --accent: #c9a84c;
+    --accent2: #7c5cbf;
+    --text: #e8e8f0;
+    --muted: #6b6b85;
+    --correct-text: #5ddb8a;
+    --wrong-text: #db5d5d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-image: radial-gradient(ellipse at 20% 20%, rgba(124,92,191,0.08) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 80%, rgba(201,168,76,0.06) 0%, transparent 60%);
+  }
+  header { text-align: center; margin: 30px 0 36px; }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent) 0%, #e8c97a 50%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    letter-spacing: -1px;
+  }
+  header p { color: var(--muted); font-size: 0.9rem; margin-top: 8px; letter-spacing: 2px; text-transform: uppercase; }
+  .progress-wrap { width: 100%; max-width: 680px; margin-bottom: 24px; }
+  .progress-info { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--muted); margin-bottom: 8px; letter-spacing: 1px; }
+  .progress-bar { height: 4px; background: var(--border); border-radius: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 10px; transition: width 0.5s cubic-bezier(.4,0,.2,1); }
+  .score-strip { display: flex; gap: 16px; margin-bottom: 24px; }
+  .score-pill { padding: 6px 18px; border-radius: 30px; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.5px; }
+  .score-pill.c { background: rgba(93,219,138,0.1); color: var(--correct-text); border: 1px solid rgba(93,219,138,0.2); }
+  .score-pill.w { background: rgba(219,93,93,0.1); color: var(--wrong-text); border: 1px solid rgba(219,93,93,0.2); }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+    padding: 36px 40px; width: 100%; max-width: 680px;
+    position: relative; overflow: hidden;
+    animation: slideIn 0.4s cubic-bezier(.4,0,.2,1);
+  }
+  .card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:linear-gradient(90deg,transparent,var(--accent2),var(--accent),transparent); }
+  @keyframes slideIn { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+  .q-number { font-size: 0.75rem; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; font-weight: 600; margin-bottom: 14px; }
+  .q-text { font-family: 'Playfair Display', serif; font-size: clamp(1rem, 2.5vw, 1.25rem); line-height: 1.6; color: var(--text); margin-bottom: 28px; font-weight: 700; }
+  .q-text em { color: var(--accent); font-style: italic; }
+  .options { display: flex; flex-direction: column; gap: 11px; }
+  .option {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; border: 1px solid var(--border); border-radius: 12px;
+    cursor: pointer; background: transparent; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 0.97rem;
+    text-align: left; transition: all 0.2s ease; width: 100%;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent2); background: rgba(124,92,191,0.08); transform: translateX(4px); }
+  .option .letter {
+    width: 30px; height: 30px; border-radius: 8px; background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.82rem; flex-shrink: 0; transition: all 0.2s; color: var(--muted);
+  }
+  .option:hover:not(:disabled) .letter { background: var(--accent2); color: white; }
+  .option.correct { border-color: var(--correct-text); background: rgba(93,219,138,0.07); animation: pulse 0.4s ease; }
+  .option.correct .letter { background: var(--correct-text); color: #0d0d14; }
+  .option.wrong { border-color: var(--wrong-text); background: rgba(219,93,93,0.07); animation: shake 0.4s ease; }
+  .option.wrong .letter { background: var(--wrong-text); color: white; }
+  @keyframes pulse { 0%{transform:scale(1)} 50%{transform:scale(1.02)} 100%{transform:scale(1)} }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 60%{transform:translateX(6px)} }
+  .feedback { margin-top: 18px; padding: 13px 16px; border-radius: 10px; font-size: 0.88rem; font-weight: 500; display: none; align-items: center; gap: 10px; }
+  .feedback.show { display: flex; }
+  .feedback.cf { background: rgba(93,219,138,0.1); color: var(--correct-text); border: 1px solid rgba(93,219,138,0.15); }
+  .feedback.wf { background: rgba(219,93,93,0.1); color: var(--wrong-text); border: 1px solid rgba(219,93,93,0.15); }
+  .next-btn { margin-top: 22px; width: 100%; padding: 15px; border-radius: 12px; border: none; background: linear-gradient(135deg,var(--accent2),var(--accent)); color: white; font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:600; cursor:pointer; display:none; letter-spacing:0.5px; transition:opacity 0.2s,transform 0.2s; }
+  .next-btn:hover { opacity:0.9; transform:translateY(-2px); }
+  .next-btn.show { display:block; animation:fadeUp 0.3s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .result-screen { text-align:center; padding:50px 40px; display:none; }
+  .result-screen.show { display:block; animation:slideIn 0.5s ease; }
+  .result-emoji { font-size:4rem; margin-bottom:20px; }
+  .result-title { font-family:'Playfair Display',serif; font-size:2rem; font-weight:900; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:10px; }
+  .result-sub { color:var(--muted); font-size:1rem; margin-bottom:28px; }
+  .result-big { font-size:4.5rem; font-weight:700; font-family:'Playfair Display',serif; color:var(--accent); line-height:1; margin-bottom:8px; }
+  .result-label { color:var(--muted); font-size:0.9rem; letter-spacing:2px; text-transform:uppercase; margin-bottom:32px; }
+  .restart-btn { padding:15px 44px; border-radius:12px; border:none; background:linear-gradient(135deg,var(--accent2),var(--accent)); color:white; font-family:'DM Sans',sans-serif; font-size:1rem; font-weight:600; cursor:pointer; transition:opacity 0.2s,transform 0.2s; }
+  .restart-btn:hover { opacity:0.9; transform:translateY(-2px); }
+  @media(max-width:520px) { .card{padding:22px 16px;} .option{padding:12px 12px;font-size:0.9rem;} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Fransuz Tili Testi</h1>
+  <p>IV Semestr · 300 ta savol bazasi</p>
+</header>
+<div class="progress-wrap">
+  <div class="progress-info">
+    <span id="qc">Savol 1 / 40</span>
+    <span id="pct">0%</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="pf" style="width:0%"></div></div>
+</div>
+<div class="score-strip">
+  <div class="score-pill c">✓ To'g'ri: <span id="cc">0</span></div>
+  <div class="score-pill w">✗ Xato: <span id="wc">0</span></div>
+</div>
+<div class="card" id="quiz-card">
+  <div class="q-number" id="qn">Savol 01</div>
+  <div class="q-text" id="qt"></div>
+  <div class="options" id="opts"></div>
+  <div class="feedback" id="fb"></div>
+  <button class="next-btn" id="nb" onclick="next()">Keyingi savol →</button>
+</div>
+<div class="card result-screen" id="rs">
+  <div class="result-emoji" id="re">🎉</div>
+  <div class="result-title">Test yakunlandi!</div>
+  <div class="result-sub">Sizning natijangiz:</div>
+  <div class="result-big" id="rscore"></div>
+  <div class="result-label" id="rlabel"></div>
+  <button class="restart-btn" onclick="restart()">Qayta boshlash 🔄</button>
+</div>
+<script>
+const ALL = [
+  {q:"«chez» predlogi ma'nosi:",a:"biror kimning uyida / oldida",o:["ichida, vaqt mobaynida","biror kimning uyida / oldida","dan buyon, beri","ustida, tepasida"]},
+  {q:"Predlogni to'g'ri qo'ying: <em>Mes amis sont ____ moi</em>",a:"chez",o:["dans","sur","chez","avec"]},
+  {q:"«depuis» predlogi ma'nosi:",a:"beri, dan buyon",o:["ichida","beri, dan buyon","uchun","bilan birga"]},
+  {q:"«être de service» iborasi ma'nosi:",a:"navbatchi bo'lmoq",o:["kasal bo'lmoq","o'tirmoq","navbatchi bo'lmoq","kech qolmoq"]},
+  {q:"«être en retard» iborasi ma'nosi:",a:"kech qolmoq",o:["hozir bo'lmoq","kech qolmoq","oyoqda turmoq","navbatchi bo'lmoq"]},
+  {q:"«être présent» iborasi ma'nosi:",a:"hozir bo'lmoq / qatnashmoq",o:["yo'q bo'lmoq","kech qolmoq","hozir bo'lmoq / qatnashmoq","kasal bo'lmoq"]},
+  {q:"«être absent» iborasi ma'nosi:",a:"yo'q bo'lmoq / qatnashmaslik",o:["hozir bo'lmoq","kasal bo'lmoq","o'tirmoq","yo'q bo'lmoq / qatnashmaslik"]},
+  {q:"«être malade» iborasi ma'nosi:",a:"kasal bo'lmoq",o:["o'tirmoq","navbatchi bo'lmoq","kasal bo'lmoq","kech qolmoq"]},
+  {q:"«être assis» iborasi ma'nosi:",a:"o'tirmoq",o:["oyoqda turmoq","o'tirmoq","kasal bo'lmoq","kech qolmoq"]},
+  {q:"«être debout» iborasi ma'nosi:",a:"oyoqda turmoq",o:["o'tirmoq","navbatchi bo'lmoq","oyoqda turmoq","yo'q bo'lmoq"]},
+  {q:"Tarjima qiling: <em>Je suis professeur de français depuis longtemps.</em>",a:"Men uzoq vaqtdan beri fransuz tili o'qituvchisiman.",o:["Men ko'p yillar fransuz tilini o'qidim.","Men uzoq vaqtdan beri fransuz tili o'qituvchisiman.","Men endi fransuz tili o'qituvchisi bo'ldim.","Men fransuz tilini zo'r bilaman."]},
+  {q:"Tarjima qiling: <em>Il est minuit.</em>",a:"Yarim tun.",o:["Tushki payt.","Ertalab.","Yarim tun.","Kechqurun."]},
+  {q:"Tarjima qiling: <em>Il est inutile.</em>",a:"Bu befoyda / keraksiz.",o:["Bu foydali.","Bu qiziqarli.","Bu befoyda / keraksiz.","Bu zarur."]},
+  {q:"Otlarda rodni qanday belgilar orqali aniqlash mumkin?",a:"Artikl orqali (le/la, un/une)",o:["Qo'shimcha orqali","Artikl orqali (le/la, un/une)","Fe'l orqali","Sifat orqali"]},
+  {q:"Egalik sifatlari ko'rsatilgan javobni toping.",a:"mon, ma, mes / ton, ta, tes / son, sa, ses",o:["le, la, l', les","ce, cet, cette, ces","mon, ma, mes / ton, ta, tes / son, sa, ses","un, une, des"]},
+  {q:"Jenskoy rod egalik sifatlari:",a:"ma, ta, sa, notre, votre, leur",o:["mon, ton, son, notre, votre, leur","ma, ta, sa, notre, votre, leur","mes, tes, ses, nos, vos, leurs","ce, cette, ces"]},
+  {q:"Jenskoy rod yasovchi suffikslar:",a:"-euse, -trice, -ière, -esse, -ienne",o:["-eur, -teur, -ier, -iste","-euse, -trice, -ière, -esse, -ienne","-ment, -tion, -age","-er, -ir, -re"]},
+  {q:"<em>J'ai ____ idée pour le projet.</em>",a:"une",o:["un","une","des","du"]},
+  {q:"<em>Nous cherchons ____ robe pas cher.</em>",a:"une",o:["un","le","une","la"]},
+  {q:"<em>Vous pouvez lire ____ livres intéressants.</em>",a:"des",o:["les","un","des","du"]},
+  {q:"<em>Je bois ____ café chaque matin.</em>",a:"du",o:["le","un","de la","du"]},
+  {q:"<em>Il mange __ pain et __ fromage.</em>",a:"du … du",o:["le … le","un … un","du … du","de la … de la"]},
+  {q:"<em>Nous ne buvons pas ____ eau minérale.</em>",a:"d'",o:["du","de la","des","d'"]},
+  {q:"<em>Elle ne mange pas ____ soupe chaude.</em>",a:"de",o:["du","de la","des","de"]},
+  {q:"Tarjima qiling: <em>Elle est à la campagne.</em>",a:"U qishloqda (dalada).",o:["U shaharda.","U qishloqda (dalada).","U maktabda.","U uyda."]},
+  {q:"Tarjima qiling: <em>Aller à sa place.</em>",a:"O'z joyiga bormoq / o'rniga qaytmoq.",o:["Joy izlamoq.","Joyni egallash.","O'z joyiga bormoq / o'rniga qaytmoq.","Boshqa joyga ketmoq."]},
+  {q:"Tarjima qiling: <em>Décembre. C'est le dernier mois de l'année.</em>",a:"Dekabr — yilning oxirgi oyi.",o:["Dekabr — yilning birinchi oyi.","Dekabr — yilning oxirgi oyi.","Dekabr — qishning boshi.","Dekabr — eng sovuq oy."]},
+  {q:"Birinchi guruh fe'llari (-er) misollari:",a:"parler, aimer, travailler, habiter",o:["finir, choisir, remplir","être, avoir, faire, aller","parler, aimer, travailler, habiter","vendre, prendre, mettre"]},
+  {q:"<em>Elle n'achète pas ____ légumes frais.</em>",a:"de",o:["des","les","de","du"]},
+  {q:"<em>Il y a du beurre ___ la table.</em>",a:"sur",o:["dans","sous","sur","entre"]},
+  {q:"<em>Je ___ français à l'université.</em>",a:"étudie",o:["étudies","étudie","étudions","étudient"]},
+  {q:"<em>____ soleil brille aujourd'hui.</em>",a:"Le",o:["La","Les","Le","Un"]},
+  {q:"<em>Marie et Paul ___ une voiture rouge.</em>",a:"ont",o:["sont","ont","font","vont"]},
+  {q:"Inkor gap: <em>Je ___ café.</em>",a:"ne bois pas de",o:["ne bois pas du","ne bois pas de","pas bois du","ne bois de"]},
+  {q:"<em>Hier, nous ___ à Paris.</em>",a:"sommes allés",o:["avons allé","sommes allés","allons","avons été"]},
+  {q:"«acteur» ning jenskoy rodi:",a:"actrice",o:["acteure","acteuresse","actrice","acteuse"]},
+  {q:"<em>Je cherche ___ livre intéressant.</em>",a:"un",o:["une","le","un","des"]},
+  {q:"<em>Si j'ai le temps, je ___ te voir.</em>",a:"viendrai",o:["viens","viendrai","suis venu","venais"]},
+  {q:"<em>Ils parlent français ___ anglais.</em>",a:"et",o:["ou","mais","et","donc"]},
+  {q:"<em>Vous ___ très bien français.</em>",a:"parlez",o:["parlons","parles","parlez","parlent"]},
+  {q:"<em>Mon frère ___ au football tous les week-ends.</em>",a:"joue",o:["jouons","joues","joue","jouent"]},
+  {q:"<em>Elle aime le thé, ___ elle n'aime pas le café.</em>",a:"mais",o:["et","ou","mais","donc"]},
+  {q:"<em>___ heure est-il?</em>",a:"Quelle",o:["Quel","Quelle","Comment","Combien"]},
+  {q:"<em>Ils ___ leurs devoirs maintenant.</em>",a:"font",o:["ont","sont","vont","font"]},
+  {q:"<em>J'habite ___ Ouzbékistan.</em>",a:"en",o:["à","au","en","dans"]},
+  {q:"<em>Nous avons acheté ___ pommes au marché.</em>",a:"des",o:["les","de","des","du"]},
+  {q:"<em>Nous n'avons pas acheté ___ pommes au marché.</em>",a:"de",o:["des","les","de","du"]},
+  {q:"<em>Elle ___ née en 2005.</em>",a:"est",o:["a","est","était","avait"]},
+  {q:"<em>Il n'y a pas ____ beurre dans le frigo.</em>",a:"de",o:["du","de la","le","de"]},
+  {q:"<em>Pouvez-vous parler plus ___ ?</em>",a:"lentement",o:["vite","lentement","fort","doucement"]},
+  {q:"O'tkan zamon (passé composé) qaysi yordamchi fe'llar bilan yasaladi?",a:"avoir va être",o:["avoir va faire","être va aller","avoir va être","faire va venir"]},
+  {q:"<em>Ils ____ à la bibliothèque.</em>",a:"sont",o:["ont","font","sont","vont"]},
+  {q:"<em>Tu ____ malade aujourd'hui?</em>",a:"es",o:["as","fais","es","vas"]},
+  {q:"<em>Je ____ du sport tous les jours.</em>",a:"fais",o:["suis","ai","fais","vais"]},
+  {q:"<em>Ils ne mangent pas ____ pommes rouges.</em>",a:"de",o:["des","les","de","du"]},
+  {q:"Passé composéda to'g'ri tuslanган fe'llar qatori:",a:"j'ai mangé, il est parti, nous avons fini",o:["je mangeais, il partait, nous finissions","j'ai mangé, il est parti, nous avons fini","je mange, il part, nous finissons","j'avais mangé, il était parti, nous avions fini"]},
+  {q:"Passé composéda to'g'ri tuslanган fe'llar:",a:"tu as parlé, ils ont vu, elle a écrit",o:["tu parlais, ils voyaient, elle écrivait","tu as parlé, ils ont vu, elle a écrit","tu parles, ils voient, elle écrit","tu avais parlé, ils avaient vu, elle avait écrit"]},
+  {q:"<em>il n'achète pas ____ viande.</em>",a:"de",o:["du","de la","des","de"]},
+  {q:"Présent zamonida to'g'ri tuslanган fe'llar:",a:"je parle, tu finis, il vend, nous mangeons",o:["j'ai parlé, tu as fini, il a vendu","je parlais, tu finissais, il vendait","je parle, tu finis, il vend, nous mangeons","je parlerai, tu finiras, il vendra"]},
+  {q:"<em>Je viens ____ Angoulême aujourd'hui.</em>",a:"de",o:["à","en","de","du"]},
+  {q:"«être» bilan passé composé yasaydigan fe'llar guruhi:",a:"aller, venir, partir, arriver, naître, mourir",o:["manger, parler, finir, écrire","aller, venir, partir, arriver, naître, mourir","faire, prendre, voir, lire","chanter, jouer, écouter, regarder"]},
+  {q:"«avoir» bilan passé composé yasaydigan fe'llar:",a:"manger, parler, finir, écrire, lire, voir",o:["aller, venir, partir, arriver","manger, parler, finir, écrire, lire, voir","naître, mourir, rester, tomber","entrer, sortir, monter, descendre"]},
+  {q:"«manger» passé composéda qaysi yordamchi fe'l?",a:"avoir → j'ai mangé",o:["être → je suis mangé","avoir → j'ai mangé","faire → j'ai fait manger","aller → je suis allé manger"]},
+  {q:"«partir» passé composéda qaysi yordamchi fe'l?",a:"être → je suis parti(e)",o:["avoir → j'ai parti","être → je suis parti(e)","faire → j'ai fait partir","aller → je suis allé"]},
+  {q:"Qaysi fe'l «être» bilan EMAS, «avoir» bilan ishlatiladi?",a:"manger",o:["partir","aller","manger","naître"]},
+  {q:"«être» bilan to'g'ri gap:",a:"Elle est arrivée hier.",o:["Elle a arrivée hier.","Elle est arrivée hier.","Elle avait arrivée hier.","Elle était arrivée hier."]},
+  {q:"«avoir» bilan to'g'ri gap:",a:"J'ai mangé une pomme.",o:["Je suis mangé une pomme.","J'ai mangé une pomme.","J'étais mangé une pomme.","Je mange une pomme hier."]},
+  {q:"«partir» passé composé — to'g'ri shakl:",a:"être → je suis parti(e)",o:["avoir → j'ai parti","être → je suis parti(e)","avoir → j'ai parté","être → j'ai parti"]},
+  {q:"«regarder» passé composé — to'g'ri yordamchi fe'l:",a:"avoir → j'ai regardé",o:["être → je suis regardé","avoir → j'ai regardé","faire → j'ai fait regardé","aller → je suis allé regarder"]},
+  {q:"Participe passé nima?",a:"Fe'lning o'tgan zamon sifatdosh shakli (mangé, parti, fini...)",o:["Fe'lning buyruq shakli","Fe'lning o'tgan zamon sifatdosh shakli (mangé, parti, fini...)","Fe'lning kelasi zamon shakli","Fe'lning davom shakli"]},
+  {q:"«finir» ning participe passé:",a:"fini",o:["finit","fini","finié","finis"]},
+  {q:"«écrire» ning participe passé:",a:"écrit",o:["écrivé","écriture","écrit","écrivu"]},
+  {q:"«prendre» ning participe passé:",a:"pris",o:["prenu","prendu","pris","prend"]},
+  {q:"«voir» ning participe passé:",a:"vu",o:["voit","voyé","vu","vois"]},
+  {q:"«allé» — qaysi fe'lning participe passé?",a:"aller",o:["venir","partir","aller","arriver"]},
+  {q:"«naître» ning participe passé:",a:"né",o:["naîtu","naîtré","né","nait"]},
+  {q:"«faire» ning participe passé:",a:"fait",o:["faisé","faisit","faisu","fait"]},
+  {q:"«être» bilan participe passé to'g'ri gap:",a:"Elle est partie tôt.",o:["Elle a partie tôt.","Elle est partie tôt.","Elle avait partie tôt.","Elle était partie tôt."]},
+  {q:"<em>Elle ____ ses devoirs tous les soirs.</em>",a:"fait",o:["est","a","fait","va"]},
+  {q:"<em>Je vais ____ école à pied.</em>",a:"à l'",o:["à la","au","à l'","en"]},
+  {q:"<em>Nous sommes ____ classe maintenant.</em>",a:"en",o:["dans la","à la","en","au"]},
+  {q:"<em>Il habite ____ Paris depuis deux ans.</em>",a:"à",o:["en","au","dans","à"]},
+  {q:"<em>Les enfants jouent ____ le jardin.</em>",a:"dans",o:["sur","sous","dans","entre"]},
+  {q:"<em>Tu vas ____ bibliothèque après les cours?</em>",a:"à la",o:["au","à l'","à la","aux"]},
+  {q:"<em>Le chat dort ____ la boîte.</em>",a:"dans",o:["sur","sous","dans","entre"]},
+  {q:"<em>Nous allons ____ cinéma ce soir.</em>",a:"au",o:["à la","à l'","au","aux"]},
+  {q:"<em>Il y a beaucoup d'élèves ____ la salle.</em>",a:"dans",o:["sur","sous","dans","entre"]},
+  {q:"<em>Elle étudie ____ université de Lyon.</em>",a:"à l'",o:["à la","au","à l'","en"]},
+  {q:"<em>Les livres sont ____ le sac.</em>",a:"dans",o:["sur","sous","dans","entre"]},
+  {q:"<em>Je vais ____ marché avec ma mère.</em>",a:"au",o:["à la","à l'","au","aux"]},
+  {q:"<em>Les étudiants sont ____ la bibliothèque.</em>",a:"à la",o:["au","à l'","à la","en"]},
+  {q:"<em>Nous habitons ____ Tachkent.</em>",a:"à",o:["en","au","dans","à"]},
+  {q:"<em>Le chien dort ____ la maison.</em>",a:"dans",o:["sur","à","dans","en"]},
+  {q:"<em>Elle va ____ école en bus.</em>",a:"à l'",o:["à la","au","à l'","en"]},
+  {q:"<em>Il y a un tableau ____ la classe.</em>",a:"dans",o:["sur","sous","dans","entre"]},
+  {q:"<em>Nous allons ____ restaurant ce soir.</em>",a:"au",o:["à la","à l'","au","aux"]},
+  {q:"<em>Les enfants jouent ____ parc.</em>",a:"dans le",o:["au","à la","dans le","en"]},
+  {q:"<em>Tu étudies ____ université?</em>",a:"à l'",o:["à la","au","à l'","en"]},
+  {q:"<em>Les vêtements sont ____ l'armoire.</em>",a:"dans",o:["sur","sous","dans","entre"]},
+  {q:"Le verbe «parler» — qaysi guruh?",a:"1-guruh (-er)",o:["2-guruh (-ir)","3-guruh (noto'g'ri)","1-guruh (-er)","4-guruh (-re)"]},
+  {q:"Le verbe «finir» — qaysi guruh?",a:"2-guruh (-ir)",o:["1-guruh (-er)","2-guruh (-ir)","3-guruh (noto'g'ri)","4-guruh"]},
+  {q:"Le verbe «prendre» — qaysi guruh?",a:"3-guruh (noto'g'ri)",o:["1-guruh (-er)","2-guruh (-ir)","3-guruh (noto'g'ri)","2-guruh (-re)"]},
+  {q:"1-guruhga tegishli fe'l:",a:"parler",o:["finir","prendre","parler","être"]},
+  {q:"2-guruhga tegishli fe'l:",a:"finir",o:["parler","finir","prendre","faire"]},
+  {q:"3-guruhga tegishli fe'l:",a:"prendre",o:["parler","finir","chanter","prendre"]},
+  {q:"1-guruh fe'llari tugashi:",a:"-er",o:["-ir","-re","-er","-oir"]},
+  {q:"2-guruh fe'llari tugashi:",a:"-ir",o:["-er","-ir","-re","-oir"]},
+  {q:"Le verbe «vendre» — qaysi guruh?",a:"3-guruh (-re)",o:["1-guruh (-er)","2-guruh (-ir)","3-guruh (-re)","4-guruh"]},
+  {q:"Noto'g'ri (irrégulier) fe'llar qaysi guruhda?",a:"3-guruh",o:["1-guruh","2-guruh","3-guruh","Barcha guruhlar"]},
+  {q:"«faire» fe'li ikkinchi fe'l bilan birikib qanday ma'no bildiradi?",a:"Orttirma daraja (causatif)",o:["Inkor ma'no","Orttirma daraja (causatif)","Savol ma'nosi","O'tgan zamon"]},
+  {q:"Buyruq forma fransuz tilida qanday ataladi?",a:"L'impératif",o:["Le subjonctif","Le conditionnel","L'impératif","L'infinitif"]},
+  {q:"Antonimlar to'g'ri berilgan qator:",a:"grand ≠ petit / chaud ≠ froid",o:["grand ≠ gros / chaud ≠ froid","grand ≠ petit / chaud ≠ froid","vieux ≠ âgé / beau ≠ joli","fort ≠ puissant / beau ≠ laid"]},
+  {q:"«Bâtir» fe'li tarjimasi:",a:"qurmoq / bino qilmoq",o:["buzmoq","qurmoq / bino qilmoq","o'rganmoq","yozmoq"]},
+  {q:"Antonimlar to'g'ri berilgan qator:",a:"entrer ≠ sortir / monter ≠ descendre",o:["entrer ≠ arriver / monter ≠ tomber","entrer ≠ sortir / monter ≠ descendre","partir ≠ rester / ouvrir ≠ fermer","venir ≠ partir / prendre ≠ donner"]},
+  {q:"«bon» ning antonimi:",a:"mauvais",o:["bien","mal","mauvais","méchant"]},
+  {q:"Antonimlar: vieux — ?",a:"jeune",o:["âgé","nouveau","jeune","petit"]},
+  {q:"Antonimlar: ami — ?",a:"ennemi",o:["camarade","ennemi","frère","collègue"]},
+  {q:"«Qo'rqmoq» iborasini toping:",a:"avoir peur",o:["avoir faim","avoir peur","avoir soif","avoir raison"]},
+  {q:"«Haq bo'lmoq» iborasini toping:",a:"avoir raison",o:["avoir tort","avoir raison","avoir envie","avoir besoin"]},
+  {q:"«Havas qilmoq» iborasini toping:",a:"avoir envie",o:["avoir besoin","avoir peur","avoir envie","avoir faim"]},
+  {q:"«Och qolmoq» iborasini toping:",a:"avoir faim",o:["avoir soif","avoir peur","avoir faim","avoir froid"]},
+  {q:"«Muhtoj bo'lmoq» iborasini toping:",a:"avoir besoin",o:["avoir envie","avoir peur","avoir raison","avoir besoin"]},
+  {q:"«dans» predlogi ma'nosi:",a:"ichida / vaqt mobaynida",o:["ustida","ichida / vaqt mobaynida","ostida","yonida"]},
+  {q:"Artikllar ishlatilmaydigan holatlar:",a:"Kasb, shahar nomi, ism-familiya oldidan",o:["Har doim ishlatiladi","Kasb, shahar nomi, ism-familiya oldidan","Faqat inkor gaplarda","Faqat ko'plikda"]},
+  {q:"<em>Ils ne mangent pas __ fruits.</em>",a:"de",o:["des","les","de","du"]},
+  {q:"Egalik sifatlari fransuz tilida qanday ataladi?",a:"Les adjectifs possessifs",o:["Les adjectifs démonstratifs","Les adjectifs possessifs","Les adjectifs qualificatifs","Les pronoms personnels"]},
+  {q:"Egalik sifatlari to'liq qatori:",a:"mon, ma, mes / ton, ta, tes / son, sa, ses...",o:["le, la, l', les","ce, cet, cette, ces","mon, ma, mes / ton, ta, tes / son, sa, ses...","un, une, des"]},
+  {q:"Mujskiy rod egalik sifatlari:",a:"mon, ton, son, notre, votre, leur",o:["mon, ton, son, notre, votre, leur","ma, ta, sa, notre, votre, leur","mes, tes, ses, nos, vos, leurs","ce, cet"]},
+  {q:"Jenskiy rod egalik sifatlari:",a:"ma, ta, sa, notre, votre, leur",o:["mon, ton, son","ma, ta, sa, notre, votre, leur","mes, tes, ses","ce, cette"]},
+  {q:"Ko'plik egalik sifatlari:",a:"mes, tes, ses, nos, vos, leurs",o:["mon, ton, son","ma, ta, sa","mes, tes, ses, nos, vos, leurs","ce, ces"]},
+  {q:"«Navbatchi bo'lmoq» iborasini toping:",a:"être de service",o:["être en retard","être de service","être malade","être assis"]},
+  {q:"«Kech qolmoq» iborasini toping:",a:"être en retard",o:["être de service","être en retard","être présent","être malade"]},
+  {q:"«O'tirmoq» iborasini toping:",a:"être assis",o:["être debout","être en retard","être assis","être présent"]},
+  {q:"«Bor bo'lmoq» iborasini toping:",a:"être présent",o:["être absent","être malade","être présent","être assis"]},
+  {q:"«Kasal bo'lmoq» iborasini toping:",a:"être malade",o:["être absent","être en retard","être malade","être de service"]},
+  {q:"2002 raqami fransuz tilida:",a:"deux mille deux",o:["deux cents deux","deux mille deux","deux mille vingt-deux","deux mille et deux"]},
+  {q:"1997 raqami fransuz tilida:",a:"mille neuf cent quatre-vingt-dix-sept",o:["mille neuf cent quatre-vingt-sept","mille neuf cent soixante-dix-sept","mille neuf cent quatre-vingt-dix-sept","mille neuf cent quatre-vingt-dix-neuf"]},
+  {q:"1992 raqami fransuz tilida:",a:"mille neuf cent quatre-vingt-douze",o:["mille neuf cent soixante-douze","mille neuf cent quatre-vingt-deux","mille neuf cent quatre-vingt-douze","mille neuf cent quatre-vingt-dix-deux"]},
+  {q:"1887 raqami fransuz tilida:",a:"mille huit cent quatre-vingt-sept",o:["mille huit cent soixante-sept","mille huit cent quatre-vingt-sept","mille huit cent quatre-vingt-dix-sept","mille neuf cent quatre-vingt-sept"]},
+  {q:"1899 raqami fransuz tilida:",a:"mille huit cent quatre-vingt-dix-neuf",o:["mille huit cent soixante-dix-neuf","mille huit cent quatre-vingt-neuf","mille huit cent quatre-vingt-dix-neuf","mille neuf cent quatre-vingt-dix-neuf"]},
+  {q:"1918 raqami fransuz tilida:",a:"mille neuf cent dix-huit",o:["mille neuf cent huit","mille neuf cent dix-huit","mille neuf cent dix","mille neuf cent quatre-vingt-dix-huit"]},
+  {q:"<em>Je mange ____ soupe.</em>",a:"de la",o:["du","de la","des","un"]},
+  {q:"<em>Je ne mange pas ____ pain.</em>",a:"de",o:["du","de la","des","de"]},
+  {q:"«Il y a» iborasi o'zbek tilida:",a:"bor / mavjud",o:["yo'q","bor / mavjud","kerak","mumkin"]},
+  {q:"<em>Est-ce qu'il y a des étudiants dans cette salle?</em> tarjimasi:",a:"Bu sinfda talabalar bormi?",o:["Bu sinfda o'qituvchilar bormi?","Bu sinfda talabalar bormi?","Bu sinfda kitoblar bormi?","Bu sinfda stullar bormi?"]},
+  {q:"<em>Tu ____ content aujourd'hui?</em>",a:"es",o:["as","fais","es","vas"]},
+  {q:"<em>Qu'est-ce que c'est?</em> tarjimasi:",a:"Bu nima?",o:["Bu kimning?","Bu qayerda?","Bu nima?","Bu qachon?"]},
+  {q:"1-guruh fe'llari qatori:",a:"parler, aimer, chanter, travailler",o:["finir, choisir, remplir","être, avoir, faire, aller","parler, aimer, chanter, travailler","vendre, prendre, mettre"]},
+  {q:"«Qaysi? Qancha?» so'roq olmoshlari:",a:"quel/quelle / combien",o:["qui / quoi","où / quand","quel/quelle / combien","comment / pourquoi"]},
+  {q:"«dan, ning» (mujskoy rod) — artikl:",a:"du (= de + le)",o:["de la","des","de l'","du (= de + le)"]},
+  {q:"<em>Nous ____ heureux de te voir.</em>",a:"sommes",o:["avons","sommes","faisons","allons"]},
+  {q:"«ga, da» (jenskoy rod) — artikl:",a:"à la",o:["au","à l'","à la","aux"]},
+  {q:"«ga, da» (mujskoy rod) — artikl:",a:"au (= à + le)",o:["à la","aux","au (= à + le)","à l'"]},
+  {q:"«ga, da» (ko'plik) — artikl:",a:"aux (= à + les)",o:["au","à la","à l'","aux (= à + les)"]},
+  {q:"«Faire attention» ma'nosi:",a:"ehtiyot bo'lmoq / diqqat qilmoq",o:["to'shakni yig'ishtirmoq","ehtiyot bo'lmoq / diqqat qilmoq","idish-tovoq yuvmoq","sayr qilmoq"]},
+  {q:"«Faire le lit» ma'nosi:",a:"to'shakni yig'ishtirmoq",o:["ehtiyot bo'lmoq","to'shakni yig'ishtirmoq","idish-tovoq yuvmoq","navbatda turmoq"]},
+  {q:"Antonimlar: monter — ?",a:"descendre",o:["tomber","rester","descendre","sortir"]},
+  {q:"Antonimlar: beau — ?",a:"laid",o:["joli","moche","laid","mauvais"]},
+  {q:"2-guruh fe'llari qatori:",a:"finir, choisir, remplir, réussir",o:["parler, aimer, travailler","être, avoir, faire, aller","finir, choisir, remplir, réussir","vendre, prendre, mettre"]},
+  {q:"«Qanday? Qancha?» so'roq olmoshlari:",a:"comment / combien",o:["qui / quoi","où / quand","comment / combien","quel / quelle"]},
+  {q:"<em>Le ____ est un animal sauvage.</em>",a:"lion",o:["chat","chien","lion","lapin"]},
+  {q:"«Sayr qilmoq» iborasini toping:",a:"faire une promenade",o:["faire attention","faire une promenade","faire la queue","faire du sport"]},
+  {q:"«Idish-tovoq yuvmoq» iborasini toping:",a:"faire la vaisselle",o:["faire la queue","faire le lit","faire la vaisselle","faire attention"]},
+  {q:"Milliy mansublikni bildiruvchi suffikslar:",a:"-ain/-aine, -ais/-aise, -ien/-ienne, -ois/-oise",o:["-eur/-euse, -teur/-trice","-ain/-aine, -ais/-aise, -ien/-ienne, -ois/-oise","-ment, -tion, -age","-er, -ir, -re"]},
+  {q:"Mujskiy rod ot yasovchi suffikslar:",a:"-eur, -teur, -ier, -iste, -ien",o:["-euse, -trice, -ière","-eur, -teur, -ier, -iste, -ien","-ment, -tion","-er, -ir, -re"]},
+  {q:"Jenskiy rod ot yasovchi suffikslar:",a:"-euse, -trice, -ière, -esse, -ienne",o:["-eur, -teur, -ier","-euse, -trice, -ière, -esse, -ienne","-ment, -tion, -age","-er, -ir, -re"]},
+  {q:"<em>Quel temps ___-il aujourd'hui?</em>",a:"fait",o:["est","a","fait","va"]},
+  {q:"<em>Nous ___ une promenade le soir.</em>",a:"faisons",o:["sommes","avons","faisons","allons"]},
+  {q:"<em>Marie porte ____ robe rouge.</em>",a:"une",o:["un","la","une","des"]},
+  {q:"Muayyan artikllar (articles définis):",a:"le, la, l', les",o:["un, une, des","ce, cet, cette, ces","le, la, l', les","mon, ma, mes"]},
+  {q:"Ko'rsatish sifatlari (adjectifs démonstratifs):",a:"ce, cet, cette, ces",o:["le, la, l', les","mon, ma, mes","ce, cet, cette, ces","un, une, des"]},
+  {q:"«Navbatda turmoq» iborasini toping:",a:"faire la queue",o:["faire le lit","faire attention","faire la vaisselle","faire la queue"]},
+  {q:"«Chanqamoq» iborasini toping:",a:"avoir soif",o:["avoir faim","avoir chaud","avoir soif","avoir mal"]},
+  {q:"<em>Il ___ froid aujourd'hui.</em>",a:"fait",o:["est","a","fait","va"]},
+  {q:"<em>Elle ___ du sport tous les jours.</em>",a:"fait",o:["est","a","fait","va"]},
+  {q:"Egalik sifatini to'g'ri qo'ying: <em>C'est ___ livre.</em> (mening)",a:"mon",o:["ma","mes","mon","son"]},
+  {q:"Egalik sifatini to'g'ri qo'ying: <em>Marie aime ___ école.</em> (uning)",a:"son",o:["sa","ses","son","leur"]},
+  {q:"Egalik sifatini to'g'ri qo'ying: <em>Nous cherchons ___ clés.</em> (bizning)",a:"nos",o:["notre","nos","leurs","vos"]},
+  {q:"Egalik sifatini to'g'ri qo'ying: <em>Tu prends ___ sac.</em> (sening)",a:"ton",o:["ta","tes","ton","son"]},
+  {q:"Egalik sifatini to'g'ri qo'ying: <em>Ils visitent ___ grand-mère.</em> (ularning)",a:"leur",o:["leurs","son","leur","votre"]},
+  {q:"Egalik sifatini to'g'ri qo'ying: <em>Je parle avec ___ amis.</em> (mening)",a:"mes",o:["mon","ma","mes","ses"]},
+  {q:"Egalik sifatini to'g'ri qo'ying: <em>Vous aimez ___ professeur.</em> (sizning)",a:"votre",o:["notre","vos","votre","leurs"]},
+  {q:"Egalik sifatini to'g'ri qo'ying: <em>Elle range ___ chambre.</em> (uning)",a:"sa",o:["son","ses","sa","leur"]},
+  {q:"Egalik sifatini to'g'ri qo'ying: <em>Nous faisons ___ devoirs.</em> (bizning)",a:"nos",o:["notre","nos","leurs","vos"]},
+  {q:"Egalik sifatini to'g'ri qo'ying: <em>Tu regardes ___ photos.</em> (sening)",a:"tes",o:["ton","ta","tes","ses"]},
+  {q:"«prendre des notes» tarjimasi:",a:"qayd qilmoq / yozib olmoq",o:["joy olmoq","so'z olmoq","qayd qilmoq / yozib olmoq","shamollash"]},
+  {q:"«prendre place» tarjimasi:",a:"joy olmoq / o'tirmoq",o:["so'z olmoq","qayd qilmoq","joy olmoq / o'tirmoq","anglamoq"]},
+  {q:"«prendre la parole» tarjimasi:",a:"so'z olmoq / gapirmoq",o:["qayd qilmoq","joy olmoq","so'z olmoq / gapirmoq","g'amxo'rlik qilmoq"]},
+  {q:"«prendre de l'âge» tarjimasi:",a:"qarishmoq / yoshga kirmoq",o:["yosh bo'lmoq","qarishmoq / yoshga kirmoq","o'sib ulg'aymoq","bolaligini eslash"]},
+  {q:"«prendre froid» tarjimasi:",a:"sovqatib qolmoq / shamollash",o:["issib ketmoq","sovqatib qolmoq / shamollash","yonib ketmoq","anglamoq"]},
+  {q:"«prendre connaissance de» tarjimasi:",a:"tanishmoq / bilib olmoq",o:["anglamoq","yozib olmoq","tanishmoq / bilib olmoq","g'amxo'rlik qilmoq"]},
+  {q:"«prendre feu» tarjimasi:",a:"yonib ketmoq / alanga olmoq",o:["o'chib qolmoq","sovib qolmoq","yonib ketmoq / alanga olmoq","qizib ketmoq"]},
+  {q:"«prendre un bain» tarjimasi:",a:"vanna qabul qilmoq",o:["suv ichmoq","vanna qabul qilmoq","cho'milmoq (daryoda)","yuvmoq"]},
+  {q:"«prendre conscience» tarjimasi:",a:"anglamoq / idrok etmoq",o:["unutmoq","anglamoq / idrok etmoq","ko'rmoq","eshitmoq"]},
+  {q:"«prendre soin» tarjimasi:",a:"g'amxo'rlik qilmoq / parvarishlamoq",o:["anglamoq","yozib olmoq","joy olmoq","g'amxo'rlik qilmoq / parvarishlamoq"]},
+  {q:"<em>«C'est un livre»</em> tarjimasi:",a:"Bu kitob.",o:["Bular kitoblar.","Bu daftar.","Bu kitob.","Bu ruchka."]},
+  {q:"<em>«Ce sont des cahiers»</em> tarjimasi:",a:"Bular daftarlar.",o:["Bu daftar.","Bular kitoblar.","Bular daftarlar.","Bular ruchkalar."]},
+  {q:"<em>«Qu'est-ce que c'est?»</em> tarjimasi:",a:"Bu nima?",o:["Bu kimning?","Bu qayerda?","Bu nima?","Bu qachon?"]},
+  {q:"<em>«Ce sont des fleurs»</em> tarjimasi:",a:"Bular gullar.",o:["Bu gul.","Bular daraxtlar.","Bular gullar.","Bu chiroyli."]},
+  {q:"<em>«Est-ce que ce sont des filles?»</em> tarjimasi:",a:"Bular qizlarmi?",o:["Bu qizmi?","Bular o'g'il bolalarmi?","Bular qizlarmi?","Bu kimlar?"]},
+  {q:"<em>«Oui, c'est un livre»</em> tarjimasi:",a:"Ha, bu kitob.",o:["Yo'q, bu kitob emas.","Ha, bu kitob.","Ha, bular kitoblar.","Ha, bu daftar."]},
+  {q:"<em>«Ce sont des photos»</em> tarjimasi:",a:"Bular rasmlar.",o:["Bu rasm.","Bular rasmlar.","Bular kitoblar.","Bu fotosuratmi?"]},
+  {q:"<em>«Est-ce que ce sont des étrangers?»</em> tarjimasi:",a:"Bular chet elliklar / begonalarmi?",o:["Bu chet elliklarsmi?","Bular chet elliklar / begonalarmi?","Bular o'zbekmi?","Bular kimlar?"]},
+  {q:"<em>«Ce sont des stylos»</em> tarjimasi:",a:"Bular ruchkalar.",o:["Bu ruchka.","Bular daftarlar.","Bular ruchkalar.","Bular qalamlar."]},
+  {q:"<em>«Ce sont des cartes»</em> tarjimasi:",a:"Bular xaritalar / kartochkalar.",o:["Bu xarita.","Bular kitoblar.","Bular xaritalar / kartochkalar.","Bu kartochkami?"]},
+  {q:"<em>«Qui entre?»</em> tarjimasi:",a:"Kim kirmoqda?",o:["Kim bor?","Kim chiqmoqda?","Kim kirmoqda?","Kim kelmoqda?"]},
+  {q:"<em>«Que dites-vous?»</em> tarjimasi:",a:"Siz nima deyapsiz?",o:["Siz nimaga qaraysiz?","Siz nima deyapsiz?","Siz qayerga borasiz?","Siz kimni ko'rmoqdasiz?"]},
+  {q:"<em>«Quel est votre prénom?»</em> tarjimasi:",a:"Ismingiz nima?",o:["Familiyangiz nima?","Yoshingiz necha?","Ismingiz nima?","Kasibingiz nima?"]},
+  {q:"<em>«Combien êtes-vous?»</em> tarjimasi:",a:"Siz nechtasiz?",o:["Siz qayerdasiz?","Siz nechtasiz?","Siz qanday?","Siz kimsiniz?"]},
+  {q:"<em>«Comment est la salle?»</em> tarjimasi:",a:"Xona qanday?",o:["Xona qayerda?","Xona qancha turadi?","Xona qanday?","Xona katta yoki kichikmi?"]},
+  {q:"<em>«Où êtes-vous?»</em> tarjimasi:",a:"Siz qayerdasiz?",o:["Siz kimsiniz?","Siz qachon kelasiz?","Siz qayerdasiz?","Siz nima deyapsiz?"]},
+  {q:"<em>«Où vont-ils?»</em> tarjimasi:",a:"Ular qayerga ketmoqda?",o:["Ular qayerdan kelmoqda?","Ular qayerga ketmoqda?","Ular kimlar?","Ular nima qilmoqda?"]},
+  {q:"<em>«Quand venez-vous?»</em> tarjimasi:",a:"Siz qachon kelasiz?",o:["Siz qayerdan kelasiz?","Siz qachon kelasiz?","Siz qanday kelasiz?","Siz nima uchun kelasiz?"]},
+  {q:"<em>«Que?»</em> so'roq so'zi tarjimasi:",a:"Nima?",o:["Qachon?","Qayerda?","Nima?","Qanday?"]},
+  {q:"<em>«Comment?»</em> so'roq so'zi tarjimasi:",a:"Qanday? / Qanaqasiga?",o:["Qachon?","Qayerda?","Qanday? / Qanaqasiga?","Nima?"]},
+  {q:"<em>Je ___ au football tous les jours.</em>",a:"joue",o:["jouons","joues","joue","jouent"]},
+  {q:"<em>Hier, nous ___ un film intéressant.</em>",a:"avons regardé",o:["sommes regardés","avons regardé","regardons","regardions"]},
+  {q:"<em>Elle ___ à l'école chaque matin.</em>",a:"va",o:["est allée","allait","va","ira"]},
+  {q:"<em>Hier soir, ils ___ au marché.</em>",a:"sont allés",o:["avons allé","ont allé","sont allés","allaient"]},
+  {q:"<em>Tu ___ tes devoirs maintenant.</em>",a:"fais",o:["as fait","es fait","fais","faisais"]},
+  {q:"<em>Nous ___ beaucoup de plats hier soir.</em>",a:"avons mangé",o:["sommes mangés","avons mangé","mangions","mangeons"]},
+  {q:"<em>Je ___ ma grand-mère dimanche dernier.</em>",a:"ai visité",o:["suis visité","ai visité","visitais","visite"]},
+  {q:"<em>Vous ___ français très bien.</em>",a:"parlez",o:["parlons","parles","parlez","parlent"]},
+  {q:"<em>Marie ___ à la maison après les cours.</em>",a:"rentre",o:["est rentrée","rentrait","rentre","rentrera"]},
+  {q:"<em>Hier soir, tu ___ très tard.</em>",a:"es rentré(e)",o:["as rentré","es rentré(e)","rentres","rentrais"]},
+  {q:"«être» bilan passé composé yasaydigan fe'llar to'liq ro'yxati:",a:"aller, venir, partir, arriver, naître, mourir, entrer, sortir, monter, descendre, rester, tomber",o:["manger, parler, finir, écrire, lire","aller, venir, partir, arriver, naître, mourir, entrer, sortir, monter, descendre, rester, tomber","faire, prendre, voir, dire, écrire","chanter, jouer, écouter, regarder, parler"]},
+  {q:"«partir» — passé composé yordamchi fe'li:",a:"être → je suis parti(e)",o:["avoir → j'ai parti","être → je suis parti(e)","faire → j'ai fait partir","aller → je suis allé"]},
+  {q:"«regarder» — passé composé yordamchi fe'li:",a:"avoir → j'ai regardé",o:["être → je suis regardé","avoir → j'ai regardé","faire → j'ai fait regardé","aller → je suis allé regarder"]},
+  {q:"«être» bilan passé composé to'g'ri gap:",a:"Elle est arrivée hier matin.",o:["Elle a arrivée hier matin.","Elle est arrivée hier matin.","Elle avait arrivée hier matin.","Elle était arrivée hier matin."]},
+  {q:"«avoir» bilan passé composé to'g'ri gap:",a:"J'ai mangé une pizza.",o:["Je suis mangé une pizza.","J'ai mangé une pizza.","J'étais mangé une pizza.","Je mange une pizza hier."]},
+  {q:"Faqat «être» bilan tuslanadigan fe'llar guruhi:",a:"aller, venir, partir, arriver, naître, mourir, entrer, sortir, monter, descendre, rester, tomber",o:["manger, parler, finir, voir, lire","aller, venir, partir, arriver, naître, mourir, entrer, sortir, monter, descendre, rester, tomber","faire, prendre, écrire, dire","chanter, aimer, regarder, jouer"]},
+  {q:"Participe passé ta'rifi:",a:"Fe'lning o'tgan zamon sifatdosh shakli; avoir/être bilan ishlatiladi",o:["Fe'lning buyruq shakli","Fe'lning o'tgan zamon sifatdosh shakli; avoir/être bilan ishlatiladi","Fe'lning kelasi zamon shakli","Fe'lning hozirgi zamon shakli"]},
+  {q:"«finir» ning participe passé:",a:"fini",o:["finit","fini","finié","finis"]},
+  {q:"«écrire» ning participe passé:",a:"écrit",o:["écrivé","écriture","écrit","écrivu"]},
+];
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+let questions, cur, correct, wrong, answered;
+const LT = ['A','B','C','D'];
+
+function init(){
+  questions = shuffle([...ALL]).slice(0,40);
+  cur=0; correct=0; wrong=0; answered=false;
+  document.getElementById('rs').className='card result-screen';
+  document.getElementById('quiz-card').style.display='';
+  render();
+}
+
+function render(){
+  const q=questions[cur];
+  answered=false;
+  document.getElementById('qn').textContent=`Savol ${String(cur+1).padStart(2,'0')}`;
+  document.getElementById('qc').textContent=`Savol ${cur+1} / ${questions.length}`;
+  document.getElementById('pct').textContent=Math.round((cur/questions.length)*100)+'%';
+  document.getElementById('pf').style.width=((cur/questions.length)*100)+'%';
+  document.getElementById('qt').innerHTML=q.q;
+  const opts=shuffle([...q.o]);
+  const c=document.getElementById('opts');
+  c.innerHTML='';
+  opts.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='option';
+    b.innerHTML=`<span class="letter">${LT[i]}</span><span>${o}</span>`;
+    b.onclick=()=>select(b,o,q.a,opts);
+    c.appendChild(b);
+  });
+  const fb=document.getElementById('fb');
+  fb.className='feedback';
+  fb.textContent='';
+  document.getElementById('nb').className='next-btn';
+  document.getElementById('cc').textContent=correct;
+  document.getElementById('wc').textContent=wrong;
+}
+
+function select(btn,chosen,answer){
+  if(answered)return;
+  answered=true;
+  document.querySelectorAll('.option').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('fb');
+  if(chosen===answer){
+    btn.classList.add('correct');
+    correct++;
+    fb.className='feedback cf show';
+    fb.innerHTML='✓ To\'g\'ri javob!';
+  } else {
+    btn.classList.add('wrong');
+    wrong++;
+    document.querySelectorAll('.option').forEach(b=>{
+      if(b.querySelector('span:last-child').textContent===answer) b.classList.add('correct');
+    });
+    fb.className='feedback wf show';
+    fb.innerHTML=`✗ Xato! To'g'ri: <strong>${answer}</strong>`;
+  }
+  document.getElementById('cc').textContent=correct;
+  document.getElementById('wc').textContent=wrong;
+  document.getElementById('nb').className='next-btn show';
+}
+
+function next(){
+  cur++;
+  if(cur>=questions.length){showResult();}
+  else{
+    const card=document.getElementById('quiz-card');
+    card.style.animation='none';
+    card.offsetHeight;
+    card.style.animation='';
+    render();
+  }
+}
+
+function showResult(){
+  document.getElementById('quiz-card').style.display='none';
+  document.getElementById('pf').style.width='100%';
+  document.getElementById('pct').textContent='100%';
+  const pct=Math.round((correct/questions.length)*100);
+  document.getElementById('rs').className='card result-screen show';
+  document.getElementById('rscore').textContent=correct+' / '+questions.length;
+  document.getElementById('rlabel').textContent=pct+"% to'g'ri javob";
+  document.getElementById('re').textContent=pct>=90?'🏆':pct>=70?'🎉':pct>=50?'📚':'💪';
+}
+
+function restart(){init();}
+init();
+</script>
+</body>
+</html>
